@@ -12,7 +12,40 @@ const gpa = util.gpa;
 const data = @embedFile("../data/day01.txt");
 
 pub fn main() !void {
+    var counterPart1: u64 = 0;
+    var counterPart2: u64 = 0;
 
+    var tempOrFirst:u64 = 0;
+    const test_allocator = std.testing.allocator;
+    var list = List(u64).init(test_allocator);
+    var lines = tokenize(u8,data, "\r\n");
+
+    while(lines.next()) |line| {
+        var currentLine = parseInt(u64, line, 10) catch unreachable;
+        list.append(currentLine) catch unreachable;
+        if(tempOrFirst < currentLine){
+            counterPart1 +=1;
+        }
+        tempOrFirst = currentLine;
+    }
+
+    var index: u32 = 0;
+    while(index < list.items.len -3) :(index +=1){
+        var a1Num : u64 = list.items[index];
+        var a2b1Num :u64 = list.items[index+1];
+        var a3b2Num:u64 = list.items[index+2];
+        var b3Num: u64 = list.items[index+3];
+
+        var partA :u64 = a1Num + a2b1Num + a3b2Num;
+        var partB :u64 = a2b1Num + a3b2Num + b3Num;
+
+        if(partA < partB){
+            counterPart2 += 1;
+        }
+    }
+
+    std.debug.print("Day 1 Part 1: {}\n", .{counterPart1-1});
+    std.debug.print("Day 1 Part 2: {}\n", .{counterPart2});
 }
 
 // Useful stdlib functions
