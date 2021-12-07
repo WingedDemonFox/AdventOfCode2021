@@ -1,44 +1,62 @@
 const std = @import("std");
-const Allocator = std.mem.Allocator;
-const List = std.ArrayList;
-const Map = std.AutoHashMap;
-const StrMap = std.StringHashMap;
-const BitSet = std.DynamicBitSet;
-const Str = []const u8;
-
-const util = @import("util.zig");
-const gpa = util.gpa;
 
 const data = @embedFile("../data/day06.txt");
 
 pub fn main() !void {
     
+    var lines = tokenize(u8,data, "\r\n");
+    var fishCycle = [9]u64 {0,0,0,0,0,0,0,0,0};
+    while(lines.next()) |line|{
+        var tokenized = tokenize(u8, line, ",");
+        while(tokenized.next()) |splitted|{
+            var numParsed = try parseInt(u64,splitted,10);
+            fishCycle[numParsed] += 1;
+        }
+    }
+
+    var daysPassed: u64= 0;
+    while(daysPassed < 80) : (daysPassed+=1){
+        var fish0:u64 = fishCycle[0];
+        fishCycle[0] = fishCycle[1];
+        fishCycle[1] = fishCycle[2];
+        fishCycle[2] = fishCycle[3];
+        fishCycle[3] = fishCycle[4];
+        fishCycle[4] = fishCycle[5];
+        fishCycle[5] = fishCycle[6];
+        fishCycle[6] = fishCycle[7]+fish0;
+        fishCycle[7] = fishCycle[8];
+        fishCycle[8] = fish0;
+    }
+
+    print("Day 6 Part 1: {} \n", .{countFish(fishCycle)});
+
+    while(daysPassed < 256) :(daysPassed+=1){
+        var fish0:u64 = fishCycle[0];
+        fishCycle[0] = fishCycle[1];
+        fishCycle[1] = fishCycle[2];
+        fishCycle[2] = fishCycle[3];
+        fishCycle[3] = fishCycle[4];
+        fishCycle[4] = fishCycle[5];
+        fishCycle[5] = fishCycle[6];
+        fishCycle[6] = fishCycle[7]+fish0;
+        fishCycle[7] = fishCycle[8];
+        fishCycle[8] = fish0;
+    }
+
+    print("Day 6 Part 2: {} \n", .{countFish(fishCycle)});
+}
+
+fn  countFish (cyclesDone: [9]u64 ) u64{
+    var count:u64 = 0;
+    for(cyclesDone) |fish|{
+        count += fish;
+    }
+    return count;
 }
 
 // Useful stdlib functions
 const tokenize = std.mem.tokenize;
 const split = std.mem.split;
-const indexOf = std.mem.indexOfScalar;
-const indexOfAny = std.mem.indexOfAny;
-const indexOfStr = std.mem.indexOfPosLinear;
-const lastIndexOf = std.mem.lastIndexOfScalar;
-const lastIndexOfAny = std.mem.lastIndexOfAny;
-const lastIndexOfStr = std.mem.lastIndexOfLinear;
-const trim = std.mem.trim;
-const sliceMin = std.mem.min;
-const sliceMax = std.mem.max;
 
 const parseInt = std.fmt.parseInt;
-const parseFloat = std.fmt.parseFloat;
-
-const min = std.math.min;
-const min3 = std.math.min3;
-const max = std.math.max;
-const max3 = std.math.max3;
-
 const print = std.debug.print;
-const assert = std.debug.assert;
-
-const sort = std.sort.sort;
-const asc = std.sort.asc;
-const desc = std.sort.desc;
